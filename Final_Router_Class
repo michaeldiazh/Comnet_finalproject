@@ -1,0 +1,96 @@
+""" Most came from Final_Router with a bit more ease from using a router as a class, we'll discuss this more on tuesday"""
+
+import time
+from socket import socket, AF_INET, SOCK_DGRAM
+import struct
+import select
+import random
+import asyncore
+import threading
+import Queue
+import json
+class Router:
+
+    def __init__(self,addr,neighbors):
+        self.neighbors = neighbors
+        self.addr = addr
+        #self.my_queue = Queue.Queue()
+    """
+    First Creates A Wrapper Def s.t all functions are stored in a queue when called in to main.
+    """
+ '''   def storeInQueue(f):
+      def wrapper(*args):
+        self.my_queue.put(f(*args))
+      return wrapper
+'''
+   # @ storeInQueue
+    def create_hello(SRC):
+        '''pkttype = 1B
+            scr = 1B
+            seq = 1B'''
+        Hello_packet = struct.pack('BBB', 1, 1, SRC) # Given from Yuan's main
+        return Hello_packet
+
+  #  @ storeInQueue
+    def read_hello_header():
+
+
+        header = self.neighbor[0:] #Note, since neighbor is a characteristic to the Router class, use self.neighbors
+        #pktFormat = "BBB"
+        #pktSize = struct.calcsize(pktFormat)
+        pkttype,  SEQ, SRC= struct.unpack("BBB", header)
+        return  SRC
+
+    #def find_shortest_path(Graph, source_num, dest_num):
+  #  @ storeInQueue
+    def create_LSpacket(pketype, SEQ, SRC, LS_data):
+        '''pketype = 1B
+            seq = 1B
+            len = 2B
+            src = 1B
+            data = 1-1495B = Nodes=ID of all neighbors of SRC and Cost=number of hops to the neighbors'''
+        pkelen = len(LS_data)
+        LS_header = struct.pack('BBBH', pketype, SEQ, SRC, pkelen)
+        LSpacket = LS_header + LS_data
+        return LSpacket
+
+   # @ storeInQueue
+    def create_datapacket(pketype, SEQ, SRC, NDEST, RDEST, DEST1, DEST2, DEST3, data):
+        '''tyep = 1B
+            SEQ = 1B
+            LEN = 2B
+            NDEST=RDEST=DEST1=DEST2=DEST3 = 1B
+            DATA = 1-1491B'''
+        pkelen = len(data)
+        data_packet_header = struct.pack('BBHBBBBBB',pketype, SEQ, pkelen, SRC, NDEST, RDEST, DEST1, DEST2, DEST3)
+        return data_packet_header+data
+
+  #  @ storeInQueue
+    def create_dataACK(pketype, SEQ, SRC, DEST):
+        '''TYPE = 1B
+            SEQ = 1B
+            DEST1 = 1B'''
+        ACK_packet = struct.pack('BBB', pketype, SEQ, SRC, DEST)
+        return ACK_packet
+
+        #Router receive the data
+   # @ storeInQueue
+    def send_packet(pkt):
+        my_socket = socket(AF_INET, SOCK_DGRAM)
+        for i in range(len(self.neighbors))
+            my_socket.sendto(pkt, (self.neighbors[i], 1)) #I beleive there is no need to do threading, only thing we need is the packet itself (use create hello fnt.)
+            my_socket.close()
+            print("Sent packet to the destination: ", dst_addr)
+        return 0
+
+  #  @ storeInQueue
+    def receive_router(port_num):
+        router_receive = socket(AF_INET, SOCK_DGRAM)
+        router_receive.bind((self.addr, port_num))
+        while True:
+            message,addr = router_receive.recvfrom(1024)
+            print("Received packet", message, "from source", addr)
+            return message.decode('UTF-8')
+
+    """def get_neighbor(g,start_vertex):
+                    return g[start_vertex]"""
